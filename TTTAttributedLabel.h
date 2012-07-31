@@ -104,6 +104,11 @@ extern NSString * const kTTTStrikeOutAttributeName;
  */
 @property (nonatomic, assign) CGFloat shadowRadius;
 
+/**
+ Determines if the label supports the strike out attribute, disable as a performance optimization. The default value is YES.
+ */
+@property (nonatomic, assign) BOOL supportsStrikeOut;
+
 ///--------------------------------------------
 /// @name Acccessing Paragraph Style Attributes
 ///--------------------------------------------

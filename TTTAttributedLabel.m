@@ -162,6 +162,7 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
 @synthesize links = _links;
 @synthesize linkAttributes = _linkAttributes;
 @synthesize shadowRadius = _shadowRadius;
+@synthesize supportsStrikeOut = _supportsStrikeOut;
 @synthesize leading = _leading;
 @synthesize lineHeightMultiple = _lineHeightMultiple;
 @synthesize firstLineIndent = _firstLineIndent;
@@ -201,6 +202,7 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
     self.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
     
     self.textInsets = UIEdgeInsetsZero;
+    self.supportsStrikeOut = YES;
     
     self.userInteractionEnabled = YES;
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
@@ -480,7 +482,9 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
         }
     }
 
-    [self drawStrike:frame inRect:rect context:c];
+    if (self.supportsStrikeOut) {
+        [self drawStrike:frame inRect:rect context:c];
+    }
     
     CFRelease(frame);
     CFRelease(path);
