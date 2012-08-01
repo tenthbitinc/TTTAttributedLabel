@@ -478,7 +478,35 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
                 CTLineDraw(line, c);
             }
         } else {
-            CTLineDraw(line, c);
+            CFIndex glyphCount = CTLineGetGlyphCount(line);
+            if (glyphCount != 2) {
+                CTLineDraw(line, c);
+            } else {
+                CFRange stringRange = CTLineGetStringRange(line);
+                if ([self.text characterAtIndex:stringRange.location] == 0xE987) {
+                    CGRect lineBounds = CTLineGetImageBounds(line, c);
+                    
+                    CGContextSaveGState(c);
+                    
+                    CGFloat y = roundf(lineBounds.origin.y + (lineBounds.size.height / 2.0f));
+                    CGContextMoveToPoint(c, 0, y);
+                    CGContextAddLineToPoint(c, rect.size.width, y);
+                    CGContextSetShouldAntialias(c, NO);
+                    CGContextSetLineWidth(c, 0.5f);
+                    
+                    static UIColor *separatorColor = nil;
+                    if (!separatorColor) {
+                        separatorColor = [UIColor colorWithRed:217.0/255.0 green:214.0/255.0 blue:211.0/255.0 alpha:1];
+                    }
+                    
+                    CGContextSetStrokeColorWithColor(c, separatorColor.CGColor);
+                    CGContextStrokePath(c);
+                    
+                    CGContextRestoreGState(c);
+                } else {
+                    CTLineDraw(line, c);
+                }
+            }
         }
     }
 
