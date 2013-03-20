@@ -257,7 +257,19 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
     [self didChangeValueForKey:@"dataDetectorTypes"];
     
     if (self.dataDetectorTypes != UIDataDetectorTypeNone) {
-        self.dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeFromUIDataDetectorType(self.dataDetectorTypes) error:nil];
+        static NSMutableDictionary *dataDetectorCache = nil;
+        if (!dataDetectorCache) {
+            dataDetectorCache = [NSMutableDictionary dictionaryWithCapacity:1];
+        }
+        NSNumber *dataDetectorTypeID = @(dataDetectorTypes);
+        NSDataDetector *cachedDetector = dataDetectorCache[dataDetectorTypeID];
+        if (cachedDetector) {
+            self.dataDetector = cachedDetector;
+        } else {
+            cachedDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeFromUIDataDetectorType(self.dataDetectorTypes) error:nil];
+            dataDetectorCache[dataDetectorTypeID] = cachedDetector;
+            self.dataDetector = cachedDetector;
+        }
     }
 }
 
