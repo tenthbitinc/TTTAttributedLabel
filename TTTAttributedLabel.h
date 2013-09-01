@@ -148,6 +148,11 @@ extern NSString * const kTTTStrikeOutAttributeName;
  */
 @property (nonatomic, assign) TTTAttributedLabelVerticalAlignment verticalAlignment;
 
+/**
+ An array of detected 0xE988 separator lines, invisible when rendered
+ */
+@property (readonly, nonatomic, strong) NSArray *tbSeparatorLinesHack;
+
 ///----------------------------------
 /// @name Setting the Text Attributes
 ///----------------------------------

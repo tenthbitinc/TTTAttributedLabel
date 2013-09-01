@@ -135,6 +135,7 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
 @property (readwrite, nonatomic, strong) NSDataDetector *dataDetector;
 @property (readwrite, nonatomic, strong) NSArray *links;
 @property (readwrite, nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
+@property (nonatomic, strong) NSArray *tbSeparatorLinesHack;
 
 - (void)commonInit;
 - (void)setNeedsFramesetter;
@@ -407,6 +408,7 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
 }
 
 - (void)drawFramesetter:(CTFramesetterRef)framesetter textRange:(CFRange)textRange inRect:(CGRect)rect context:(CGContextRef)c {
+    NSMutableArray *tbSeparatorLines = [NSMutableArray array];
     CGMutablePathRef path = CGPathCreateMutable();
     
     CGPathAddRect(path, NULL, rect);
@@ -495,7 +497,8 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
                 CTLineDraw(line, c);
             } else {
                 CFRange stringRange = CTLineGetStringRange(line);
-                if ([self.text characterAtIndex:stringRange.location] == 0xE987) {
+                unichar specialChar = [self.text characterAtIndex:stringRange.location];
+                if (specialChar == 0xE987) {
                     CGRect lineBounds = CTLineGetImageBounds(line, c);
                     
                     CGContextSaveGState(c);
@@ -515,6 +518,11 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
                     CGContextStrokePath(c);
                     
                     CGContextRestoreGState(c);
+                } else if (specialChar == 0xE988) {
+                    CGRect lineBounds = CTLineGetImageBounds(line, c);
+                    CGFloat y = roundf(lineBounds.origin.y + (lineBounds.size.height / 2.0f));
+                    NSNumber *yNumber = @(y);
+                    [tbSeparatorLines addObject:yNumber];
                 } else {
                     CTLineDraw(line, c);
                 }
@@ -525,6 +533,8 @@ static inline NSAttributedString * NSAttributedStringByScalingFontSize(NSAttribu
     if (self.supportsStrikeOut) {
         [self drawStrike:frame inRect:rect context:c];
     }
+    
+    self.tbSeparatorLinesHack = tbSeparatorLines;
     
     CFRelease(frame);
     CFRelease(path);
